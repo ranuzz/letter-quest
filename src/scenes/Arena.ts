@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-ignore
 import { Scene } from 'phaser'
 
 const MAX_LEVEL_TIME = 300
@@ -6,6 +8,8 @@ export class ArenaScene extends Scene {
   game_time = 0
   points = 0
   current_level = 1
+  cursors = null
+  player = null
   constructor() {
     super('ArenaScene')
   }
@@ -31,7 +35,7 @@ export class ArenaScene extends Scene {
       this.scene.stop('MenuScene')
       this.scene.launch('HudScene', { remaining_time: this.game_time })
 
-      this.add.image(1024, 1024, 'background')
+      // this.add.image(0, 0, 'background')
       // this.add.image(512, 350, 'logo').setDepth(100)
       // this.add
       //   .text(512, 490, 'Letter Quest', {
@@ -46,21 +50,82 @@ export class ArenaScene extends Scene {
       //   .setDepth(100)
 
       const platforms = this.physics.add.staticGroup()
-      platforms.create(0, 0, 'rigid-block')
 
-      const logo = this.add.image(512, 350, 'logo').setDepth(100)
-      const logoPhys = this.physics.add.existing(logo)
+      // Arena wall with gates
+      for (let i = 0; i < 20; i++) {
+        if (i !== 9 && i !== 10) {
+          platforms.create(i * 64 + 32, 32, 'rigid-block')
+        }
+      }
+      for (let i = 0; i < 20; i++) {
+        if (i !== 9 && i !== 10) {
+          platforms.create(i * 64 + 32, 1024 - 32, 'rigid-block')
+        }
+      }
+      for (let i = 1; i < 15; i++) {
+        if (i !== 7 && i != 8) {
+          platforms.create(32, 32 + i * 64, 'rigid-block')
+        }
+      }
+      for (let i = 1; i < 15; i++) {
+        if (i !== 7 && i != 8) {
+          platforms.create(1280 - 32, 32 + i * 64, 'rigid-block')
+        }
+      }
 
-      const keyObject = this.input?.keyboard?.addKey('W') // Get key object
-      keyObject?.on('down', function (event: KeyboardEvent) {
-        /* ... */
-        console.log(event)
-        logoPhys.y -= 5
-      })
-      keyObject?.on('up', function (event: KeyboardEvent) {
-        /* ... */
-        console.log(event)
-      })
+      // Arena spawn zone with gates
+      for (let i = 5; i < 15; i++) {
+        if (i !== 9 && i !== 10) {
+          platforms.create(i * 64 + 32, 32 + 64 * 4, 'rigid-block')
+        }
+      }
+      for (let i = 5; i < 15; i++) {
+        if (i !== 9 && i !== 10) {
+          platforms.create(i * 64 + 32, 1024 - (32 + 64 * 4), 'rigid-block')
+        }
+      }
+      for (let i = 5; i < 11; i++) {
+        if (i !== 7 && i != 8) {
+          platforms.create(32 + 64 * 5, 32 + i * 64, 'rigid-block')
+        }
+      }
+      for (let i = 5; i < 11; i++) {
+        if (i !== 7 && i != 8) {
+          platforms.create(1280 - (32 + 64 * 5), 32 + i * 64, 'rigid-block')
+        }
+      }
+
+      // Inner garden
+      for (let i = 6; i < 14; i++) {
+        platforms.create(i * 64 + 32, 32 + 64 * 5, 'inner-garden')
+      }
+      for (let i = 6; i < 14; i++) {
+        platforms.create(i * 64 + 32, 1024 - (32 + 64 * 5), 'inner-garden')
+      }
+      for (let i = 6; i < 10; i++) {
+        platforms.create(32 + 64 * 6, 32 + i * 64, 'inner-garden')
+      }
+      for (let i = 6; i < 10; i++) {
+        platforms.create(1280 - (32 + 64 * 6), 32 + i * 64, 'inner-garden')
+      }
+
+      // alphabet hidden
+      for (let j = 0; j < 4; j++) {
+        for (let i = 7; i < 13; i++) {
+          platforms.create(i * 64 + 32, 32 + 64 * (6 + j), 'alphabet-hidden')
+        }
+      }
+
+      const playerFront = this.add
+        .image(1280 / 2, 1024 / 2, 'player-front')
+        .setDepth(100)
+      const playerFrontPhys = this.physics.add.existing(playerFront)
+      // @ts-ignore
+      this.player = playerFrontPhys
+
+      // Cursor keys
+      // @ts-ignore
+      this.cursors = this.input.keyboard.createCursorKeys()
 
       // Game Over timeout
       this.time.addEvent({
@@ -75,12 +140,34 @@ export class ArenaScene extends Scene {
             // this.scene.start("GameOverScene", { points: this.points });
           } else {
             this.game_time++
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             this.scene.get('HudScene').update_timeout(this.game_time)
           }
         }
       })
     })
+  }
+
+  update() {
+    // @ts-ignore
+    if (this.cursors?.up?.isDown) {
+      // @ts-ignore
+      this.player.y -= 5
+    }
+    // @ts-ignore
+    if (this.cursors?.down?.isDown) {
+      // @ts-ignore
+      this.player.y += 5
+    }
+    // @ts-ignore
+    if (this.cursors?.right?.isDown) {
+      // @ts-ignore
+      this.player.x += 5
+    }
+    // @ts-ignore
+    if (this.cursors?.left?.isDown) {
+      // @ts-ignore
+      this.player.x -= 5
+    }
   }
 }

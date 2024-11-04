@@ -8,8 +8,8 @@ import { HudScene } from './scenes/Hud'
 //  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
 const config: Types.Core.GameConfig = {
   type: AUTO,
-  width: 800,
-  height: 600,
+  width: 1280,
+  height: 1024,
   parent: 'game-container',
   backgroundColor: '#028af8',
   scale: {
@@ -27,4 +27,3 @@ const config: Types.Core.GameConfig = {
 }
 
 export default new Game(config)
-

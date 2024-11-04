@@ -12,6 +12,9 @@ export class Preloader extends Phaser.Scene {
     this.load.image('background', 'bg.png')
     this.load.image('logo', 'logo.png')
     this.load.image('rigid-block', 'using/ground_04.png')
+    this.load.image('inner-garden', 'using/ground_05.png')
+    this.load.image('alphabet-hidden', 'using/ground_03.png')
+    this.load.image('player-front', 'using/player_01.png')
 
     // Event to update the loading bar
     this.load.on('progress', (progress: number) => {
@@ -35,4 +38,3 @@ export class Preloader extends Phaser.Scene {
     this.scene.start('ArenaScene')
   }
 }
-

@@ -47,4 +47,3 @@ export class HudScene extends Scene {
     )
   }
 }
-
