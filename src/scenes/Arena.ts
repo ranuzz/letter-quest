@@ -3,6 +3,7 @@ import Wall from '../gameobjects/Wall'
 import Garden from '../gameobjects/Graden'
 import CrossWord from '../gameobjects/CrossWord'
 import Player from '../gameobjects/Player'
+import Bullets from '../gameobjects/Bullets'
 
 const MAX_LEVEL_TIME = 300
 
@@ -14,7 +15,9 @@ export class ArenaScene extends Scene {
   wallGroup: Wall | undefined
   innerGarden: Garden | undefined
   crossWord: CrossWord | undefined
-  player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | Player | undefined
+  player: Player | undefined
+  bullets: Bullets | undefined
+  inputKeys: Phaser.Input.Keyboard.Key[] | any[]
 
   constructor() {
     super('ArenaScene')
@@ -37,6 +40,11 @@ export class ArenaScene extends Scene {
       this.cursors = this.input.keyboard?.createCursorKeys()
       this.physics.world.createDebugGraphic();
       this.physics.world.debugGraphic.visible = true;
+      this.physics.world.on('worldbounds', (body: any) =>
+      {
+        console.log('onworldbounds')
+          body.gameObject.onWorldBounds();
+      });
       this.createLevel()
 
       // Game Over timeout
@@ -71,21 +79,29 @@ export class ArenaScene extends Scene {
     this.crossWord.addCrossWord()
     this.player = new Player(this, centerX, centerY) // this.physics.add.sprite(centerX, centerY, 'player-front')
     this.physics.add.collider(this.player, this.wallGroup)
+    this.bullets = new Bullets(this, { name: 'bullets'})
+      
+    this.input.on('pointerdown', () =>
+    {
+        this.bullets?.fire(this.player?.body?.x || 0, this.player?.body?.y || 0, 0, -300);
+    });
+    // Firing bullets should also work on enter / spacebar press
+		this.inputKeys = [
+			this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
+      this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
+		];
   }
 
   update() {
-    if (this.cursors?.up?.isDown) {
-        this.player?.setVelocityY(-200)
-    }
-    if (this.cursors?.down?.isDown) {
-      this.player?.setVelocityY(200)
-    }
-    if (this.cursors?.right?.isDown) {
-      this.player?.setVelocityX(200)
-    }
-    if (this.cursors?.left?.isDown) {
-      this.player?.setVelocityX(-200)
-    }
+    this.player?.move(this.cursors)
     this.wallGroup?.refresh()
+    // Loop over all keys
+		this.inputKeys?.forEach(key => {
+			// Check if the key was just pressed, and if so -> fire the bullet
+			if(Phaser.Input.Keyboard.JustDown(key)) {
+				this.bullets?.fire(this.player?.body?.x || 0, this.player?.body?.y || 0, 0, -300);
+			}
+		});
+    this.bullets?.deactivateBullets()
   }
 }

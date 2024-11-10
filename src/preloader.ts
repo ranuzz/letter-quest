@@ -15,6 +15,7 @@ export class Preloader extends Phaser.Scene {
     this.load.image('inner-garden', 'using/ground_05.png')
     this.load.image('alphabet-hidden', 'using/ground_03.png')
     this.load.image('player-front', 'using/player_01.png')
+    this.load.image('bullet', 'using/bullet.png');
 
     // Event to update the loading bar
     this.load.on('progress', (progress: number) => {
