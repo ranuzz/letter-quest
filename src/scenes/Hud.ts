@@ -6,20 +6,22 @@ export class HudScene extends Scene {
 
   remaining_time_text: Phaser.GameObjects.Text
   points_text: Phaser.GameObjects.Text
+  deposited: number = 0
 
   constructor() {
     super('HudScene')
   }
 
-  init(data: { game_time: number }) {
+  init(data: { game_time: number, deposited_count: number }) {
     this.cameras.main.fadeIn(1000, 0, 0, 0)
     this.elapsed_time = data.game_time
+    this.deposited = data.deposited_count
   }
 
   create() {
-    this.points_text = this.add.text(10, 10, 'POINTS:0000', {
+    this.points_text = this.add.text(10, 10, `DEPOSITED:${this.deposited}`, {
       fontFamily: 'Arial Black',
-      fontSize: 54,
+      fontSize: 24,
       color: '#ffffff',
       stroke: '#000000',
       strokeThickness: 8,
@@ -28,7 +30,7 @@ export class HudScene extends Scene {
     this.remaining_time_text = this.add
       .text(this.scale.width - 10, 10, `REMAINING:${this.elapsed_time}s`, {
         fontFamily: 'Arial Black',
-        fontSize: 54,
+        fontSize: 24,
         color: '#ffffff',
         stroke: '#000000',
         strokeThickness: 8,
