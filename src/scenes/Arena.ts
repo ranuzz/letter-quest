@@ -5,7 +5,7 @@ import CrossWord from '../gameobjects/CrossWord'
 import Player from '../gameobjects/Player'
 import Bullets from '../gameobjects/Bullets'
 import Enemies from '../gameobjects/Enemies'
-import { getRandomFromArray } from '../helper'
+import { createCrosswordPuzzle, fruits, getRandomFromArray } from '../helper'
 import Enemy from '../gameobjects/Enemy'
 import Bullet from '../gameobjects/Bullet'
 import Alphabets from '../gameobjects/Alphabets'
@@ -24,6 +24,7 @@ export class ArenaScene extends Scene {
   crossWord: CrossWord | undefined
   player: Player | undefined
   bullets: Bullets | undefined
+  enemyBullets: Bullets
   inputKeys: Phaser.Input.Keyboard.Key[] | any[]
   enemies: Enemies | undefined
   enemy_ys: number[] = [128, 128 + 64, 1280 - 128, 1280 - (128 * 2)]
@@ -32,8 +33,13 @@ export class ArenaScene extends Scene {
   overlapAdded = false
   alphabets: Alphabets
   collected: string[] = []
-  toCollect: string[] = ['A', 'B', 'C', 'D']
+  toCollect: string[] = []
   deposited: string[] = []
+  fruit: string
+  puzzle: string[]
+
+
+
 
   constructor() {
     super('ArenaScene')
@@ -48,6 +54,14 @@ export class ArenaScene extends Scene {
 
     for (let i = 2; i < 12; i++) {
       this.enemy_ys.push(i * 64)
+    }
+
+    this.fruit = getRandomFromArray(fruits) as string
+    this.puzzle = createCrosswordPuzzle(this.fruit.toUpperCase())
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 6; j++) {
+        this.toCollect.push(this.puzzle[i][j])
+      }
     }
   }
 
@@ -113,28 +127,6 @@ export class ArenaScene extends Scene {
         }
       })
 
-      // this.time.addEvent({
-      //   delay: 1000,
-      //   loop: true,
-      //   callback: () => {
-      //     if (this.enemies && this.bullets && this.enemies.children.entries.length === 5) {
-
-      //       this.enemies?.getChildren().forEach(child => {
-      //         const enemy = child as Enemy
-      //         console.log('add overlap')
-      //         this.physics.overlap(enemy, this.bullets, (enemy, bullet) => {
-      //          const b = bullet as Bullet
-      //          const e = enemy as Enemy
-      //          console.log('overlap !!!')
-      //          if (b && e) {
-      //            b.onWorldBounds()
-      //            e.hit()
-      //          }
-      //        })
-      //       });
-      //     }
-      //   }
-      // })
     })
   }
 
@@ -145,11 +137,12 @@ export class ArenaScene extends Scene {
     this.wallGroup.addWall()
     this.innerGarden = new Garden(this)
     this.innerGarden.addGardern()
-    this.crossWord = new CrossWord(this)
+    this.crossWord = new CrossWord(this, this.puzzle, this.fruit)
     this.crossWord.addCrossWord()
     this.player = new Player(this, centerX, centerY) // this.physics.add.sprite(centerX, centerY, 'player-front')
     this.physics.add.collider(this.player, this.wallGroup)
     this.bullets = new Bullets(this, { name: 'bullets' })
+    this.enemyBullets = new Bullets(this, { name: 'enemy-bullets' })
     this.enemies = new Enemies(this, { name: 'enemies' }, this.bullets)
     this.alphabets = new Alphabets(this, { name: 'alphabets' })
 
@@ -176,8 +169,10 @@ export class ArenaScene extends Scene {
       }
     });
     this.bullets?.deactivateBullets()
+    this.enemyBullets?.deactivateBullets()
     this.enemies?.killEnemies()
     this.alphabets?.deactivateAlphabets()
+    this.enemies?.fire(this.player?.body?.x || 0, this.player?.body?.y || 0, this.player?.direction || "down", this.enemyBullets)
 
     if (this.enemies && this.bullets && this.enemies.children.entries.length === 5) {
       this.enemies?.getChildren().forEach(child => {
@@ -194,6 +189,17 @@ export class ArenaScene extends Scene {
           }
         })
       });
+    }
+
+    if (this.player && this.enemyBullets) {
+      this.physics.overlap(this.player, this.enemyBullets, (p, bullet) => {
+        const b = bullet as Bullet
+        const c = p as Player
+        if (b && c) {
+          b.onWorldBounds()
+          c.hit()
+        }
+      })
     }
 
 
@@ -215,7 +221,7 @@ export class ArenaScene extends Scene {
     }
 
     if (this.player && this.crossWord) {
-      this.physics.overlap(this.player, this.crossWord, (p, c) => {
+      this.physics.overlap(this.player, this.crossWord, () => {
         if (this.collected.length >= 1) {
           this.collected.forEach(c => this.deposited.push(c))
           this.collected = []

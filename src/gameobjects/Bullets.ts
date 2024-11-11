@@ -25,6 +25,14 @@ export default class Bullets extends Phaser.Physics.Arcade.Group {
     }
   }
 
+  fireEnemy(x: number, y: number, px: number, py: number, direction: string) {
+    const bullet = this.getFirstDead(false);
+
+    if (bullet) {
+      bullet.fireEnemy(x, y, px, py, direction);
+    }
+  }
+
   onCreate(bullet: Bullet) {
     bullet.onCreate();
   }

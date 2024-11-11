@@ -48,4 +48,10 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
       (child as Enemy).die()
     });
   }
+
+  fire(x: number, y: number, direction: string, bullets: Bullets) {
+    this.getChildren().forEach(child => {
+      (child as Enemy).fire(x, y, direction, bullets)
+    });
+  }
 }
