@@ -1,4 +1,5 @@
 import { Scene } from 'phaser'
+import { GAME_HEIGHT, GAME_WIDTH, TILE_SIZE } from '../helper'
 
 export class MenuScene extends Scene {
   constructor() {
@@ -10,60 +11,88 @@ export class MenuScene extends Scene {
   }
 
   create() {
-    // Background rectangles
-    this.add
-      .rectangle(0, this.scale.height / 2, this.scale.width, 120, 0xffffff)
-      .setAlpha(0.8)
-      .setOrigin(0, 0.5)
+
+    this.add.sprite(TILE_SIZE * 4, TILE_SIZE * 4, 'player').setScale(2)
+
+    this.add.sprite(GAME_WIDTH - TILE_SIZE * 4, TILE_SIZE * 4, 'enemy', 0).setScale(1.5)
+    this.add.sprite(GAME_WIDTH - TILE_SIZE * 8, TILE_SIZE * 4, 'enemy', 8).setScale(1.5)
+    this.add.sprite(GAME_WIDTH - TILE_SIZE * 4, TILE_SIZE * 6, 'enemy', 16).setScale(1.5)
+    this.add.sprite(GAME_WIDTH - TILE_SIZE * 8, TILE_SIZE * 6, 'enemy', 24).setScale(1.5)
     this.add
       .rectangle(0, this.scale.height / 2 + 85, this.scale.width, 50, 0x000000)
       .setAlpha(0.8)
       .setOrigin(0, 0.5)
-
-    // Logo
-    const logo_game = this.add.text(
-      this.scale.width / 2,
-      this.scale.height / 2,
+    this.add.text(
+      GAME_WIDTH / 2,
+      GAME_HEIGHT / 2,
       'Letter Quest',
       {
-        fontFamily: 'Arial Black',
-        fontSize: 54,
+        fontFamily: 'monospace',
+        fontSize: 38,
         color: '#ffffff',
         stroke: '#000000',
         strokeThickness: 8,
         align: 'center'
       }
     )
-    logo_game.setOrigin(0.5, 0.5)
-    logo_game.postFX.addShine()
 
-    const start_msg = this.add
+    this.add.text(
+      TILE_SIZE * 4,
+      GAME_HEIGHT - TILE_SIZE * 6.5,
+      'Eliminate enemies to collect alphabets and reveal the secret word',
+      {
+        fontFamily: 'monospace',
+        fontSize: 12,
+        color: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 8,
+        align: 'center'
+      }
+    )
+
+
+    this.add
       .text(
-        this.scale.width / 2,
-        this.scale.height / 2 + 85,
+        GAME_WIDTH / 2, GAME_HEIGHT - TILE_SIZE * 3,
         'CLICK TO START',
         {
-          fontFamily: 'Arial Black',
-          fontSize: 38,
+          fontFamily: 'monospace',
+          fontSize: 12,
           color: '#ffffff',
           stroke: '#000000',
           strokeThickness: 8,
           align: 'center'
         }
       )
-      .setOrigin(0.5, 0.5)
 
-    // Tween to blink the text
-    this.tweens.add({
-      targets: start_msg,
-      alpha: 0,
-      duration: 800,
-      ease: (value: number) => Math.abs(Math.round(value)),
-      yoyo: true,
-      repeat: -1
-    })
+    this.add
+      .text(
+        TILE_SIZE * 4, GAME_HEIGHT - TILE_SIZE * 3,
+        'SpaceBar = Shoot',
+        {
+          fontFamily: 'monospace',
+          fontSize: 12,
+          color: '#ffffff',
+          stroke: '#000000',
+          strokeThickness: 8,
+          align: 'center'
+        }
+      )
 
-    // Send start-game event when user clicks
+    this.add
+      .text(
+        GAME_WIDTH - TILE_SIZE * 4, GAME_HEIGHT - TILE_SIZE * 3,
+        'Arrow Keys = Move',
+        {
+          fontFamily: 'monospace',
+          fontSize: 12,
+          color: '#ffffff',
+          stroke: '#000000',
+          strokeThickness: 8,
+          align: 'center'
+        }
+      )
+
     this.input.on('pointerdown', () => {
       this.game.events.emit('start-game')
     })

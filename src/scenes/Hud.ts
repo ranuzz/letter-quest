@@ -1,9 +1,7 @@
 import { Scene } from 'phaser'
 
-// The HUD scene is the scene that shows the points and the remaining time.
 export class HudScene extends Scene {
   elapsed_time = 0
-
   remaining_time_text: Phaser.GameObjects.Text
   points_text: Phaser.GameObjects.Text
   health: number = 0
@@ -20,7 +18,7 @@ export class HudScene extends Scene {
 
   create() {
     this.points_text = this.add.text(10, 10, `HEALTH:${this.health || 100}`, {
-      fontFamily: 'Arial Black',
+      fontFamily: 'monospace',
       fontSize: 12,
       color: '#ffffff',
       stroke: '#000000',
@@ -29,7 +27,7 @@ export class HudScene extends Scene {
     })
     this.remaining_time_text = this.add
       .text(this.scale.width - 10, 10, `${this.elapsed_time || 0}s`, {
-        fontFamily: 'Arial Black',
+        fontFamily: 'monospace',
         fontSize: 12,
         color: '#ffffff',
         stroke: '#000000',

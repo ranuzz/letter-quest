@@ -38,7 +38,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   hit() {
-    this.health -= 4
+    this.health -= 1
   }
 
   move(cursors?: Phaser.Types.Input.Keyboard.CursorKeys) {

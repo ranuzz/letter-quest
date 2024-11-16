@@ -31,7 +31,7 @@ export class GameOverScene extends Scene {
       this.scale.height / 2,
       'Game Over',
       {
-        fontFamily: 'Arial Black',
+        fontFamily: 'monospace',
         fontSize: 54,
         color: '#ffffff',
         stroke: '#000000',
@@ -48,7 +48,7 @@ export class GameOverScene extends Scene {
         this.scale.height / 2 + 85,
         this.answer,
         {
-          fontFamily: 'Arial Black',
+          fontFamily: 'monospace',
           fontSize: 38,
           color: '#ffffff',
           stroke: '#000000',

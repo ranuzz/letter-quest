@@ -37,9 +37,6 @@ export class ArenaScene extends Scene {
   fruit: string
   puzzle: string[]
 
-
-
-
   constructor() {
     super('ArenaScene')
   }
@@ -47,14 +44,10 @@ export class ArenaScene extends Scene {
   init() {
     this.cameras.main.fadeIn(1000, 0, 0, 0)
     this.scene.launch('MenuScene')
-
-    // Reset points
     this.game_time = 0
-
     for (let i = 2; i < 12; i++) {
       this.enemy_ys.push(i * TILE_SIZE)
     }
-
     this.fruit = getRandomFromArray(fruits) as string
     this.puzzle = createCrosswordPuzzle(this.fruit.toUpperCase())
     for (let i = 0; i < 4; i++) {
@@ -70,23 +63,18 @@ export class ArenaScene extends Scene {
       this.scene.stop('MenuScene')
       this.scene.launch('HudScene', { remaining_time: this.game_time, deposited_count: this.deposited.length })
       this.cursors = this.input.keyboard?.createCursorKeys()
-      // this.physics.world.createDebugGraphic();
-      // this.physics.world.debugGraphic.visible = true;
       this.physics.world.on('worldbounds', (body: any) => {
         body.gameObject.onWorldBounds();
       });
       this.createLevel()
 
-      // Game Over timeout
       this.time.addEvent({
         delay: 1000,
         loop: true,
         callback: () => {
           const playerHealth = this.player ? this.player.health : 100
           if (this.crossWord?.isRevealed() || playerHealth <= 0) {
-            // You need remove the event listener to avoid duplicate events.
             this.game.events.removeListener('start-game')
-            // It is necessary to stop the scenes launched in parallel.
             this.scene.stop('HudScene')
             this.scene.start("GameOverScene", { answer: playerHealth > 0 ? `Secret: ${this.fruit}` : 'DEAD!!!' });
           } else {
@@ -145,12 +133,9 @@ export class ArenaScene extends Scene {
     this.enemyBullets = new Bullets(this, { name: 'enemy-bullets' }, 'enemy-bullet')
     this.enemies = new Enemies(this, { name: 'enemies' }, this.bullets)
     this.alphabets = new Alphabets(this, { name: 'alphabets' })
-
-
     this.input.on('pointerdown', () => {
       this.bullets?.fire(this.player?.body?.x || 0, this.player?.body?.y || 0, this.player?.direction || "down");
     });
-    // Firing bullets should also work on enter / spacebar press
     this.inputKeys = [
       this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
       this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
@@ -161,11 +146,10 @@ export class ArenaScene extends Scene {
   update() {
     this.player?.move(this.cursors)
     this.wallGroup?.refresh()
-    // Loop over all keys
     this.inputKeys?.forEach(key => {
-      // Check if the key was just pressed, and if so -> fire the bullet
       if (Phaser.Input.Keyboard.JustDown(key)) {
         this.bullets?.fire(this.player?.body?.x || 0, this.player?.body?.y || 0, this.player?.direction || "down");
+        this.sound.play('fire')
       }
     });
     this.bullets?.deactivateBullets()
@@ -209,12 +193,12 @@ export class ArenaScene extends Scene {
         const a = alphabet as Alphabet
         if (p && a) {
           a.onWorldBounds()
-          // collect alphabet
           const collectedAlphaber = a.char
           const index = this.toCollect.indexOf(collectedAlphaber)
           if (index !== -1 && index >= 0 && index < this.toCollect.length) {
             this.toCollect.splice(index, 1)
             this.collected.push(collectedAlphaber)
+            this.sound.play('collect');
           }
         }
       })
