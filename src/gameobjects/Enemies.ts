@@ -16,7 +16,7 @@ export default class Enemies extends Phaser.Physics.Arcade.Group {
     this.bullets = bullets
 
     this.createMultiple({
-      key: 'rigid-block',
+      key: 'enemy',
       quantity: 5
     });
 

@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 import Bullet from './Bullet';
 
 export default class Bullets extends Phaser.Physics.Arcade.Group {
-  constructor(scene: Phaser.Scene, config: any) {
+  constructor(scene: Phaser.Scene, config: any, key: string) {
     super(
       scene.physics.world,
       scene,
@@ -10,7 +10,7 @@ export default class Bullets extends Phaser.Physics.Arcade.Group {
     )
 
     this.createMultiple({
-      key: 'bullet',
+      key,
       quantity: 5
     });
 

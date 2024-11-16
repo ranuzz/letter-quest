@@ -11,13 +11,20 @@ export class Preloader extends Phaser.Scene {
 
     this.load.image('background', 'bg.png')
     this.load.image('logo', 'logo.png')
-    this.load.image('rigid-block', 'using/ground_04.png')
-    this.load.image('inner-garden', 'using/ground_05.png')
-    this.load.image('alphabet-hidden', 'using/ground_03.png')
-    this.load.image('player-front', 'using/player_01.png')
-    this.load.image('bullet', 'using/bullet.png');
-    this.load.image('enemy', 'using/enemy.png')
-    this.load.image('alphabe', 'using/alphabet.png')
+    // this.load.image('rigid-block', 'using/ground_04.png')
+    // this.load.image('inner-garden', 'using/ground_05.png')
+    // this.load.image('alphabet-hidden', 'using/ground_03.png')
+    // this.load.image('player-front', 'using/player_01.png')
+    // this.load.image('bullet', 'using/bullet.png');
+    this.load.image('player-bullet', 'gimp/player-bullet.png');
+    this.load.image('enemy-bullet', 'gimp/enemy-bullet.png');
+    this.load.spritesheet('player', 'gimp/player.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('enemy', 'gimp/enemy.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('alphabet', 'gimp/alphabet.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.image('wall', 'gimp/wall.png')
+    this.load.image('grass', 'gimp/grass.png')
+    this.load.image('hidden', 'gimp/hidden.png')
+
 
     // Event to update the loading bar
     this.load.on('progress', (progress: number) => {
@@ -26,18 +33,6 @@ export class Preloader extends Phaser.Scene {
   }
 
   create() {
-    // Create bitmap font and load it in cache
-    // const config = {
-    //     image: 'knighthawks',
-    //     width: 31,
-    //     height: 25,
-    //     chars: Phaser.GameObjects.RetroFont.TEXT_SET6,
-    //     charsPerRow: 10,
-    //     spacing: { x: 1, y: 1 }
-    // };
-    // this.cache.bitmapFont.add('knighthawks', Phaser.GameObjects.RetroFont.Parse(this, config));
-
-    // When all the assets are loaded go to the next scene
     this.scene.start('ArenaScene')
   }
 }

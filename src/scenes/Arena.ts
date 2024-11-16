@@ -5,17 +5,16 @@ import CrossWord from '../gameobjects/CrossWord'
 import Player from '../gameobjects/Player'
 import Bullets from '../gameobjects/Bullets'
 import Enemies from '../gameobjects/Enemies'
-import { createCrosswordPuzzle, fruits, getRandomFromArray } from '../helper'
+import { createCrosswordPuzzle, fruits, GAME_HEIGHT, GAME_WIDTH, getRandomFromArray, TILE_SIZE } from '../helper'
 import Enemy from '../gameobjects/Enemy'
 import Bullet from '../gameobjects/Bullet'
 import Alphabets from '../gameobjects/Alphabets'
 import Alphabet from '../gameobjects/Alphabet'
 
-const MAX_LEVEL_TIME = 300
 const MAX_ENEMIES = 5
 
 export class ArenaScene extends Scene {
-  game_time = MAX_LEVEL_TIME
+  game_time = 0
   points = 0
   current_level = 1
   cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined
@@ -27,8 +26,8 @@ export class ArenaScene extends Scene {
   enemyBullets: Bullets
   inputKeys: Phaser.Input.Keyboard.Key[] | any[]
   enemies: Enemies | undefined
-  enemy_ys: number[] = [128, 128 + 64, 1280 - 128, 1280 - (128 * 2)]
-  enemy_xs: number[] = [128, 256, 1280 - 128, 1280 - 256]
+  enemy_ys: number[] = [64, 64 + TILE_SIZE, GAME_HEIGHT - 64, GAME_HEIGHT - (64 * 2)]
+  enemy_xs: number[] = [64, 128, GAME_WIDTH - 64, GAME_WIDTH - 128]
   enemy_positions: { x: number, y: number }[] = []
   overlapAdded = false
   alphabets: Alphabets
@@ -50,10 +49,10 @@ export class ArenaScene extends Scene {
     this.scene.launch('MenuScene')
 
     // Reset points
-    this.game_time = MAX_LEVEL_TIME
+    this.game_time = 0
 
     for (let i = 2; i < 12; i++) {
-      this.enemy_ys.push(i * 64)
+      this.enemy_ys.push(i * TILE_SIZE)
     }
 
     this.fruit = getRandomFromArray(fruits) as string
@@ -71,10 +70,9 @@ export class ArenaScene extends Scene {
       this.scene.stop('MenuScene')
       this.scene.launch('HudScene', { remaining_time: this.game_time, deposited_count: this.deposited.length })
       this.cursors = this.input.keyboard?.createCursorKeys()
-      this.physics.world.createDebugGraphic();
-      this.physics.world.debugGraphic.visible = true;
+      // this.physics.world.createDebugGraphic();
+      // this.physics.world.debugGraphic.visible = true;
       this.physics.world.on('worldbounds', (body: any) => {
-        console.log('onworldbounds')
         body.gameObject.onWorldBounds();
       });
       this.createLevel()
@@ -84,18 +82,19 @@ export class ArenaScene extends Scene {
         delay: 1000,
         loop: true,
         callback: () => {
-          if (this.game_time <= 0) {
+          const playerHealth = this.player ? this.player.health : 100
+          if (this.crossWord?.isRevealed() || playerHealth <= 0) {
             // You need remove the event listener to avoid duplicate events.
             this.game.events.removeListener('start-game')
             // It is necessary to stop the scenes launched in parallel.
             this.scene.stop('HudScene')
-            // this.scene.start("GameOverScene", { points: this.points });
+            this.scene.start("GameOverScene", { answer: playerHealth > 0 ? `Secret: ${this.fruit}` : 'DEAD!!!' });
           } else {
-            this.game_time--
+            this.game_time++
             // @ts-ignore
             this.scene.get('HudScene').update_timeout(this.game_time)
             // @ts-ignore
-            this.scene.get('HudScene').update_points(this.deposited.length)
+            this.scene.get('HudScene').update_points(this.player?.health || 100)
           }
         }
       })
@@ -131,6 +130,7 @@ export class ArenaScene extends Scene {
   }
 
   createLevel() {
+    this.add.image(0, 0, 'background').setOrigin(0, 0)
     const centerX = this.cameras.main.width / 2;
     const centerY = this.cameras.main.height / 2;
     this.wallGroup = new Wall(this)
@@ -139,10 +139,10 @@ export class ArenaScene extends Scene {
     this.innerGarden.addGardern()
     this.crossWord = new CrossWord(this, this.puzzle, this.fruit)
     this.crossWord.addCrossWord()
-    this.player = new Player(this, centerX, centerY) // this.physics.add.sprite(centerX, centerY, 'player-front')
+    this.player = new Player(this, centerX, centerY)
     this.physics.add.collider(this.player, this.wallGroup)
-    this.bullets = new Bullets(this, { name: 'bullets' })
-    this.enemyBullets = new Bullets(this, { name: 'enemy-bullets' })
+    this.bullets = new Bullets(this, { name: 'bullets' }, 'player-bullet')
+    this.enemyBullets = new Bullets(this, { name: 'enemy-bullets' }, 'enemy-bullet')
     this.enemies = new Enemies(this, { name: 'enemies' }, this.bullets)
     this.alphabets = new Alphabets(this, { name: 'alphabets' })
 
@@ -184,7 +184,7 @@ export class ArenaScene extends Scene {
             b.onWorldBounds()
             e.hit()
             if (e.health === 0 && e.body?.x && e.body?.y && this.toCollect.length >= 1) {
-              this.alphabets.spawn(e.body.x, e.body.y)
+              this.alphabets.spawn(e.body.x, e.body.y, getRandomFromArray(this.toCollect))
             }
           }
         })
@@ -210,11 +210,11 @@ export class ArenaScene extends Scene {
         if (p && a) {
           a.onWorldBounds()
           // collect alphabet
-          if (this.toCollect.length >= 1) {
-            const x = this.toCollect.pop()
-            if (x) {
-              this.collected.push(x)
-            }
+          const collectedAlphaber = a.char
+          const index = this.toCollect.indexOf(collectedAlphaber)
+          if (index !== -1 && index >= 0 && index < this.toCollect.length) {
+            this.toCollect.splice(index, 1)
+            this.collected.push(collectedAlphaber)
           }
         }
       })

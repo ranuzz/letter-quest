@@ -10,7 +10,7 @@ export default class Alphabets extends Phaser.Physics.Arcade.Group {
     )
 
     this.createMultiple({
-      key: 'inner-garden',
+      key: 'alphabet',
       quantity: 5
     });
 
@@ -21,11 +21,11 @@ export default class Alphabets extends Phaser.Physics.Arcade.Group {
     a.onCreate();
   }
 
-  spawn(x: number, y: number) {
+  spawn(x: number, y: number, char: string) {
     const a = this.getFirstDead(false);
 
     if (a) {
-      a.spawn(x, y);
+      a.spawn(x, y, char);
     }
   }
 

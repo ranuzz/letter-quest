@@ -1,25 +1,26 @@
 import Phaser from 'phaser'
+import { GAME_WIDTH } from '../helper'
 
 export default class Bullet extends Phaser.Physics.Arcade.Image {
   fire(x: number, y: number, direction: string) {
     this.disableBody(true, true)
     this.enableBody(true, x, y, true, true)
-    let vx = 0, vy = -500
+    let vx = 0, vy = -250
     switch (direction) {
       case "up":
         vx = 0
-        vy = -500
+        vy = -250
         break
       case "down":
         vx = 0
-        vy = 500
+        vy = 250
         break
       case "left":
-        vx = -500
+        vx = -250
         vy = 0
         break
       case "right":
-        vx = 500
+        vx = 250
         vy = 0
         break
       default:
@@ -31,8 +32,8 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
   fireEnemy(x: number, y: number, px: number, py: number, direction: string) {
     this.disableBody(true, true)
     this.enableBody(true, x, y, true, true)
-    console.log(direction)
-    const v = this.calculateBulletVelocity(x, y, px, py, 500)
+    // console.log(direction)
+    const v = this.calculateBulletVelocity(x, y, px, py, 100)
     this.setVelocity(v.velocityX, v.velocityY)
   }
 
@@ -47,7 +48,7 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
   }
 
   deactivateBullet() {
-    if (this.y <= 0 || this.y >= 1280 || this.x <= 0 || this.x >= 1280) {
+    if (this.y <= 0 || this.y >= GAME_WIDTH || this.x <= 0 || this.x >= GAME_WIDTH) {
       this.onWorldBounds()
     }
   }

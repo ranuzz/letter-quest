@@ -36,3 +36,17 @@ export function replaceCharacter(str: string, index: number, newChar: string) {
   // Create a new string with the character replaced
   return str.slice(0, index) + newChar + str.slice(index + 1);
 }
+
+export function getStartPixel(char: string) {
+  const i = allAlphabets.indexOf(char)
+  if (i !== -1) {
+    return i
+  } else {
+    return 0
+  }
+}
+
+export const TILE_SIZE = 32
+export const TILE_CENTER = 16
+export const GAME_WIDTH = 32 * 20
+export const GAME_HEIGHT = 32 * 16 

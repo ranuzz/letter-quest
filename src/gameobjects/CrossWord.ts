@@ -1,6 +1,6 @@
 // Import Phaser types
 import Phaser from 'phaser';
-import { replaceCharacter } from '../helper';
+import { getStartPixel, replaceCharacter, TILE_CENTER, TILE_SIZE } from '../helper';
 
 export default class CrossWord extends Phaser.Physics.Arcade.Group {
 
@@ -17,7 +17,7 @@ export default class CrossWord extends Phaser.Physics.Arcade.Group {
     // alphabet hidden
     for (let j = 0; j < 4; j++) {
       for (let i = 7; i < 13; i++) {
-        this.create(i * 64 + 32, 32 + 64 * (6 + j), 'alphabet-hidden')
+        this.create(i * TILE_SIZE + TILE_CENTER, TILE_CENTER + TILE_SIZE * (6 + j), 'hidden')
       }
     }
   }
@@ -25,9 +25,10 @@ export default class CrossWord extends Phaser.Physics.Arcade.Group {
   reveal(deposited: string[]) {
     for (let i = 0; i < deposited.length; i++) {
       const [x, y] = this.getXY(deposited[i])
-      console.log(x, y)
+      const pixel = getStartPixel(deposited[i])
+      // console.log(x, y)
       if (x !== -1 && y !== -1) {
-        this.create(32 + 64 * (y + 7), 32 + 64 * (x + 6), 'inner-garden')
+        this.create(TILE_CENTER + TILE_SIZE * (y + 7), TILE_CENTER + TILE_SIZE * (x + 6), 'alphabet', pixel)
       }
     }
   }
@@ -48,5 +49,17 @@ export default class CrossWord extends Phaser.Physics.Arcade.Group {
     }
 
     return [x, y]
+  }
+
+  isRevealed() {
+    let result = true
+    for (let i = 0; i < this.crossword.length; i++) {
+      for (let j = 0; j < this.crossword[i].length; j++) {
+        if (this.crossword[i][j] !== "*") {
+          result = false
+        }
+      }
+    }
+    return result
   }
 }
